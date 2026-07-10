@@ -1,2 +1,0 @@
-# quizhub
-Quiz for myself
