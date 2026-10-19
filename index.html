@@ -1,4 +1,4 @@
-<title>JPA Persistence Quiz</title>
+<title>JPA & JSF Quiz</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -77,6 +77,11 @@ h1 .at { color: var(--accent); }
   padding: 7px 13px; display: inline-flex; gap: 8px; align-items: center;
 }
 .chip .n { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.deck { display: flex; flex-direction: column; gap: 8px; }
+.deck + .deck { margin-top: 8px; padding-top: 14px; border-top: 1px solid var(--line); }
+.deckhead { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.deckname { font-weight: 600; font-size: 15px; }
+.deckname .n { font-family: var(--font-mono); font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 6px; }
 .chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
 .chip[aria-pressed="true"] .n { color: var(--accent); }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; align-self: flex-start; }
@@ -160,24 +165,31 @@ h2.sec { font-family: var(--font-display); font-weight: 600; font-size: 20px; ma
 
 <div class="wrap">
   <header>
-    <span class="eyebrow">CST8218 · Persistence with JPA</span>
-    <h1>JPA Persistence <span class="at">Quiz</span></h1>
-    <p class="lede">Multiple-choice practice built from the lecture slides: beans and injection, JPA and JDBC, entity mapping, persistence units, and the Lab 2 move to MariaDB.</p>
+    <span class="eyebrow">CST8218 · Persistence with JPA · JavaServer Faces</span>
+    <h1>JPA &amp; JSF <span class="at">Quiz</span></h1>
+    <p class="lede">Multiple-choice practice built from two lecture decks: persistence with JPA (beans, entity mapping, persistence units, Lab 2) and JavaServer Faces (Facelets, EL, scopes, the request lifecycle, conversion and validation).</p>
   </header>
   <main id="app"></main>
 </div>
 
 <script>
+const DECKS = { jpa: "Persistence with JPA", jsf: "JavaServer Faces" };
 const TOPICS = {
   arch:   "Architecture & layers",
   beans:  "Beans & injection",
   jpa:    "JPA, ORM & JDBC",
   entity: "Entity mapping",
   pu:     "Persistence units & JTA",
-  lab:    "DataSource & Lab 2"
+  lab:    "DataSource & Lab 2",
+  rest:   "REST recap & two paths",
+  face:   "Facelets & templates",
+  el:     "Named beans, scopes & EL",
+  life:   "Lifecycle & navigation",
+  conv:   "Conversion & validation"
 };
+const TOPIC_DECK = { arch:"jpa", beans:"jpa", jpa:"jpa", entity:"jpa", pu:"jpa", lab:"jpa", rest:"jsf", face:"jsf", el:"jsf", life:"jsf", conv:"jsf" };
 
-const BANK = [
+const JPA_BANK = [
   // Architecture & layers (slides 2-4)
   {t:"arch", s:2, q:"What kind of architecture does the AddressBook application use?",
    o:["Single-tier desktop architecture","2-tier client/server architecture","3-tier architecture","Peer-to-peer architecture"], a:2,
@@ -392,6 +404,194 @@ const BANK = [
    e:"Lab 1 starts with the annotated entity and JPA creates the table. Lab 2 starts with the MariaDB table and NetBeans generates the entity."}
 ];
 
+const JSF_BANK = [
+  // REST recap & two paths (slides 2-4)
+  {t:"rest", s:2, q:"In the REST recap, what is Postman?",
+   o:["The EJB that stores contacts","A client used to test the API","The JPA provider","A JSF page"], a:1,
+   e:"Postman is a client that sends HTTP requests to test the RESTful API."},
+  {t:"rest", s:2, q:"What does `ContactFacadeREST` do?",
+   o:["Renders Facelets as HTML","Receives HTTP requests and performs operations on Contact resources","Defines the CONTACT table","Validates JSF form input"], a:1,
+   e:"`ContactFacadeREST` is the JAX-RS entry point. It handles HTTP requests and returns responses, often containing JSON."},
+  {t:"rest", s:3, q:"Why can Postman, a mobile app and a B2B system all use the same RESTful API?",
+   o:["They all run inside GlassFish","They don't need to know how the server stores Contact data","They all use JSF pages","They share one HTTP session"], a:1,
+   e:"Clients exchange XML or JSON with the API and never depend on how the server stores the data."},
+  {t:"rest", s:4, q:"What do `ContactFacade` and `ContactFacadeREST` have in common?",
+   o:["Both are JSF backing beans","Both extend `AbstractFacade<Contact>` and inherit its basic CRUD operations","Both are session-scoped CDI beans","Both render HTML"], a:1,
+   e:"The JSF path and the REST path have two entry points but share basic CRUD code through `AbstractFacade<Contact>`."},
+  {t:"rest", s:4, q:"Which sequence is the JSF page path to the data?",
+   o:["Browser → JAX-RS → ContactFacadeREST → JPA","Browser → Facelet → ContactController → ContactFacade → JPA","Browser → ContactFacade → Facelet → JPA","Browser → REST endpoint → ContactController → Database"], a:1,
+   e:"The JSF page does not call the REST endpoint. It goes through the Facelet and `ContactController` to `ContactFacade`."},
+
+  // Facelets & templates (slides 5-9)
+  {t:"face", s:5, q:"Which description fits JSF?",
+   o:["A client-side JavaScript library","A server-side, component-based framework for building web user interfaces","A database driver","A REST testing tool"], a:1,
+   e:"JSF builds web UIs on the server from components, then sends HTML to the browser."},
+  {t:"face", s:5, q:"What does the browser receive when it requests a Facelet?",
+   o:["The raw `.xhtml` source","HTML generated by JSF on GlassFish","The Java bytecode of the backing bean","A JSON document"], a:1,
+   e:"The Facelet is the page we write. JSF processes it on GlassFish, and the browser receives HTML."},
+  {t:"face", s:6, q:"Which AddressBook file is an example of a Facelet?",
+   o:["`Contact.java`","`persistence.xml`","`Create.xhtml`","`ContactFacade.java`"], a:2,
+   e:"A Facelet is a JSF page in an `.xhtml` file, such as `Create.xhtml`."},
+  {t:"face", s:7, q:"Which statement correctly compares a Facelet with plain HTML?",
+   o:["A Facelet runs in the browser; HTML runs on the server","A Facelet runs on the server and can access Java objects; HTML runs in the browser and cannot","Both can use EL expressions","HTML can use `h:` and `f:` tags"], a:1,
+   e:"Facelets run on the server, use EL and JSF tags, and generate HTML. Plain HTML has none of those."},
+  {t:"face", s:7, q:"Is a Facelet sent directly to the browser?",
+   o:["Yes, browsers understand `.xhtml` with JSF tags","No, it is processed first and becomes HTML","Only on postback requests","Only when it has no EL"], a:1,
+   e:"The Facelet is never sent as-is. JSF processes it and sends the resulting HTML."},
+  {t:"face", s:8, q:"How is a JSF tag library made available in a Facelet?",
+   o:["With a Java `import` statement","As an XML namespace declared near the top of the `.xhtml` file","In `persistence.xml`","With a `<script>` tag"], a:1,
+   e:"For example, `xmlns:h=\"jakarta.faces.html\"` binds the `h:` prefix to the HTML component library."},
+  {t:"face", s:8, q:"Which prefix is used for Facelets composition and template tags?",
+   o:["`h:`","`f:`","`ui:`","`c:`"], a:2,
+   e:"`ui:` covers `<ui:composition>`, `<ui:define>` and `<ui:insert>`."},
+  {t:"face", s:8, q:"Which tag library does `<f:convertDateTime>` belong to?",
+   o:["UI components that render HTML","Core JSF features","Facelets composition and templates","Bean Validation"], a:1,
+   e:"The `f:` prefix is the core JSF library, which includes converters and validators such as `<f:validateLongRange>`."},
+  {t:"face", s:9, q:"What does Facelets templating let you do?",
+   o:["Share the same layout across several pages","Generate entity classes from tables","Run JSF pages without a server","Convert dates automatically"], a:0,
+   e:"A template such as `template.xhtml` defines the shared layout, and pages like `Create.xhtml` fill in their own content."},
+  {t:"face", s:9, q:"In `Create.xhtml`, which tag selects the template?",
+   o:["`<ui:insert>`","`<ui:define>`","`<ui:composition>`","`<h:head>`"], a:2,
+   e:"`<ui:composition template=\"/template.xhtml\">` selects the template the page uses."},
+  {t:"face", s:9, q:"What does `<ui:insert name=\"body\" />` do in `template.xhtml`?",
+   o:["Supplies the page body content","Defines a slot in the template","Imports another template","Inserts a database row"], a:1,
+   e:"`<ui:insert>` defines a slot. A page fills it with `<ui:define name=\"body\">`."},
+  {t:"face", s:9, q:"What connects a `<ui:define>` in a page to a `<ui:insert>` in the template?",
+   o:["Matching `name` values, such as `name=\"title\"`","Matching file names","The order of the tags","The bean's scope"], a:0,
+   e:"The two files are linked by matching names, such as `name=\"title\"` and `name=\"body\"`."},
+
+  // Named beans, scopes & EL (slides 10-13)
+  {t:"el", s:10, q:"What is a named bean?",
+   o:["A database table with a name column","A Java object managed by the Jakarta EE container through CDI","A Facelet template","An HTML form"], a:1,
+   e:"A named bean is CDI-managed. `@Named` makes it available to Facelets through EL."},
+  {t:"el", s:10, q:"What is a backing bean?",
+   o:["A named bean used to support a JSF page, storing page state and handling user actions","The JPA entity behind a table","A backup copy of the database","The template every page uses"], a:0,
+   e:"`ContactController` is both a named bean and the backing bean for the Contact Facelets."},
+  {t:"el", s:10, q:"What controls how long a named bean instance remains available?",
+   o:["Its scope annotation","The `@Named` value","The Facelet's file name","The database connection pool"], a:0,
+   e:"A scope annotation such as `@SessionScoped` sets the bean's lifetime."},
+  {t:"el", s:11, q:"Which scope lives for one HTTP request only?",
+   o:["`@RequestScoped`","`@SessionScoped`","`@ApplicationScoped`","`@Stateless`"], a:0,
+   e:"`@RequestScoped` beans last for one request. `@SessionScoped` spans a user's session, and `@ApplicationScoped` lasts for the whole application."},
+  {t:"el", s:11, q:"Why shouldn't user-specific data go in an `@ApplicationScoped` bean?",
+   o:["It is deleted after every request","All users share the same instance","It cannot be used from EL","It is never serialized"], a:1,
+   e:"An application-scoped bean is shared by every user, so one user's data would be visible to all."},
+  {t:"el", s:11, q:"A user opens the AddressBook in two tabs of the same browser. What usually happens with the `@SessionScoped` `ContactController`?",
+   o:["Each tab gets its own instance","Both tabs usually share the same instance","The bean is destroyed","GlassFish rejects the second tab"], a:1,
+   e:"Each HTTP session has its own session-scoped bean, and tabs in the same browser usually share that session."},
+  {t:"el", s:12, q:"What is the normal syntax of a JSF EL expression?",
+   o:["`${bean->property}`","`#{beanName.property}`","`<%= bean.property %>`","`{{beanName.property}}`"], a:1,
+   e:"JSF EL uses `#{beanName.property}`, for example `#{contactController.selected.homePhone}`."},
+  {t:"el", s:12, q:"In `#{contactController.selected.homePhone}`, what is `selected`?",
+   o:["The name of the backing bean","A Contact property of `ContactController` for the contact being created, viewed or edited","A database column","A JSF tag"], a:1,
+   e:"`contactController` is the bean, `selected` is its Contact property, and `homePhone` is a property of that Contact."},
+  {t:"el", s:12, q:"Where are EL expressions evaluated?",
+   o:["In the browser, by JavaScript","On the server, while JSF processes the request","In the database","In NetBeans at compile time"], a:1,
+   e:"The server evaluates EL during the JSF request, which lets a Facelet use Java objects without Java code in the `.xhtml` file."},
+  {t:"el", s:13, q:"Which three things can EL do with a backing bean?",
+   o:["Read values, update values and invoke methods","Compile, deploy and test","Create, drop and alter tables","Encrypt, sign and verify"], a:0,
+   e:"`h:outputText` reads a value, `h:inputText` reads and updates a value, and `h:commandButton` invokes a method."},
+  {t:"el", s:13, q:"How does JSF use `<h:inputText value=\"#{contactController.selected.homePhone}\" />`?",
+   o:["It only displays the value","It reads the value when rendering and updates it when the user submits valid input","It calls `homePhone()` as an action method","It sends the value straight to the database"], a:1,
+   e:"An input bound with EL works both ways: read during rendering, written back after valid submission."},
+  {t:"el", s:13, q:"What happens with `<h:commandButton value=\"Save\" action=\"#{contactController.create}\" />` when the form is submitted?",
+   o:["JSF reads a property named `create`","JSF invokes the `create()` method","The browser calls a REST endpoint","Nothing until the page reloads"], a:1,
+   e:"An EL expression in an `action` attribute names a method, so JSF invokes `create()`."},
+
+  // Lifecycle & navigation (slides 14, 16-19)
+  {t:"life", s:14, q:"In JSF, what is the view?",
+   o:["The HTML the browser displays","A tree of UI components that represents a page","A database view","The template file"], a:1,
+   e:"JSF represents each page as a component tree called the view."},
+  {t:"life", s:14, q:"What is a postback request?",
+   o:["The browser requesting a page for the first time","The user submitting a JSF form from an existing view","A REST POST from Postman","A redirect after logout"], a:1,
+   e:"An initial request loads a page for the first time. A postback submits a form from a view that already exists."},
+  {t:"life", s:14, q:"Which is the correct order of the six postback phases?",
+   o:["Restore View, Apply Request Values, Process Validations, Update Model Values, Invoke Application, Render Response","Apply Request Values, Restore View, Update Model Values, Process Validations, Invoke Application, Render Response","Restore View, Process Validations, Apply Request Values, Invoke Application, Update Model Values, Render Response","Render Response, Restore View, Apply Request Values, Process Validations, Update Model Values, Invoke Application"], a:0,
+   e:"Values are restored, applied, validated, written to the model, and only then is the action invoked and the response rendered."},
+  {t:"life", s:16, q:"Which steps happen during an initial request?",
+   o:["Read the Facelet, build the component tree, evaluate EL, render HTML","Restore view, apply values, validate, invoke action","Persist the Contact, then render HTML","Send JSON to the browser"], a:0,
+   e:"An initial request such as `GET /contact/List.xhtml` builds the view and renders it. No form data is processed."},
+  {t:"life", s:16, q:"Does an initial request always create a new HTTP session and a new `ContactController`?",
+   o:["Yes, every time","No, an existing session-scoped bean may already exist","Only for `List.xhtml`","Only after a validation error"], a:1,
+   e:"If the user already has a session, the existing session-scoped `ContactController` is reused."},
+  {t:"life", s:17, q:"What happens in the Apply Request Values phase?",
+   o:["Components read the submitted request parameters","Valid values are written to the bean","The action method runs","The HTML response is generated"], a:0,
+   e:"In the AddressBook form, this is when the component receives the submitted email."},
+  {t:"life", s:17, q:"In the AddressBook form, during which phase does `selected.setEmail(...)` run?",
+   o:["Restore View","Process Validations","Update Model Values","Render Response"], a:2,
+   e:"Phase 4, Update Model Values, writes valid values to backing-bean properties. Phase 5 then calls `create()`."},
+  {t:"life", s:17, q:"Does JSF update the model before or after invoking the action method?",
+   o:["Before","After","At the same time","It never updates the model"], a:0,
+   e:"JSF updates the model before invoking the action, so `create()` sees the submitted values in `selected`."},
+  {t:"life", s:18, q:"What does `<h:link value=\"View Contacts\" outcome=\"List\" />` do?",
+   o:["Runs a server-side action, then navigates","Generates a normal link that navigates directly to a JSF view","Submits the current form","Calls the REST API"], a:1,
+   e:"`<h:link>` is simple navigation with no action method. `<h:commandLink>` is used when a server-side action must run first."},
+  {t:"life", s:18, q:"What is the String returned by an action method such as `prepareCreate()`?",
+   o:["The navigation outcome","The new contact's ID","The SQL to execute","An error message"], a:0,
+   e:"Returning `\"Create\"` tells JSF to show `Create.xhtml`."},
+  {t:"life", s:19, q:"How do `prepareCreate()` and `create()` differ?",
+   o:["`prepareCreate()` saves the Contact; `create()` shows the form","`prepareCreate()` makes an empty Contact and opens the form; `create()` saves the completed Contact after valid submission","Both save the Contact","Both run before the form is displayed"], a:1,
+   e:"`prepareCreate()` runs before the form appears. `create()` runs after valid data is submitted."},
+  {t:"life", s:19, q:"What is `contactController.selected` right after `prepareCreate()` runs?",
+   o:["`null`","A new, empty `Contact`","A completed Contact","A row in the database"], a:1,
+   e:"`selected` goes from `null`, to `new Contact()` after `prepareCreate()`, to a completed Contact after Update Model Values, to a stored row after `create()`."},
+  {t:"life", s:19, q:"While the user is typing in the Create form, what changes on the server?",
+   o:["`selected` updates with each keystroke","Nothing; typing only changes the browser's form fields until Save is clicked","The database row updates","`create()` runs repeatedly"], a:1,
+   e:"After Save, JSF validates the values, updates `selected`, and then invokes `create()`."},
+
+  // Conversion & validation (slides 20-26)
+  {t:"conv", s:20, q:"In what form does a browser submit form values?",
+   o:["As Java objects","As text (Strings)","As JSON entities","As SQL"], a:1,
+   e:"Everything arrives as text, so JSF must convert values before writing them to the bean."},
+  {t:"conv", s:20, q:"Which question does validation ask, as opposed to conversion?",
+   o:["Can this text be converted to the required Java type?","Is the converted value allowed by the application's rules?","Which page should be shown next?","Which bean owns this property?"], a:1,
+   e:"Conversion asks whether the text fits the Java type. Validation asks whether the converted value is acceptable."},
+  {t:"conv", s:20, q:"If conversion or validation fails, what does JSF do?",
+   o:["Updates the model and skips the action","Skips the model update and the action, and renders the page again with an error message","Saves the raw text to the database","Ends the user's session"], a:1,
+   e:"Invalid data never reaches the model, and the action method is not invoked."},
+  {t:"conv", s:21, q:"What does a converter do?",
+   o:["Translates between the browser's text representation and the Java model value","Checks that a value is in range","Chooses the next page","Opens a database connection"], a:0,
+   e:"For example, `\"2026-09-27\"` becomes a `Date` on submission, and the `Date` becomes text again during Render Response."},
+  {t:"conv", s:21, q:"When do you need a converter tag?",
+   o:["For every input, because JSF never converts automatically","When a specific format is required","Only for String properties","Only on initial requests"], a:1,
+   e:"JSF converts many common types automatically based on the property type. Converter tags are for specific formats."},
+  {t:"conv", s:22, q:"With `<f:convertDateTime pattern=\"yyyy-MM-dd\" />`, the user enters `24/05/2001`. What happens?",
+   o:["The date is stored as May 24, 2001","Conversion fails and the conversion error message is shown","Validation fails because the date is in the past","The action runs with a null birthday"], a:1,
+   e:"The text doesn't match the pattern, so conversion fails. The model isn't updated and the action isn't invoked."},
+  {t:"conv", s:22, q:"In the birthday example, what do `converterMessage` and `<h:message for=\"birthday\">` each do?",
+   o:["`converterMessage` defines the error text; `<h:message>` chooses where it appears","`converterMessage` shows the error; `<h:message>` defines its text","Both set the date format","Both validate the date range"], a:0,
+   e:"`converterMessage` sets the text, such as \"Please enter the date as yyyy-MM-dd.\", and `<h:message>` displays it next to the component."},
+  {t:"conv", s:23, q:"When does validation happen?",
+   o:["Before conversion","After successful conversion","After the action method","Only on initial requests"], a:1,
+   e:"A value must first be the correct type before JSF checks whether it is acceptable."},
+  {t:"conv", s:23, q:"A user enters `2050-05-24` as a birthday, and the rule says it must be in the past. What happens?",
+   o:["Conversion fails","Conversion succeeds, then validation fails","Both succeed and the Contact is saved","The page navigates to List.xhtml"], a:1,
+   e:"It is a valid date, so conversion succeeds. It breaks the rule, so validation fails and `selected.birthday` is not updated."},
+  {t:"conv", s:24, q:"How do Bean Validation annotations differ from JSF component validation?",
+   o:["Bean Validation places rules on the model; JSF validators place rules on one page component","Bean Validation is written in the Facelet; JSF validation is written in Java","They are the same thing","JSF validation applies to every page using the model"], a:0,
+   e:"Annotations such as `@Past` on the property apply wherever the model is used. `required` or `<f:validateLongRange>` apply only to that input."},
+  {t:"conv", s:24, q:"Which of these is a Bean Validation annotation rather than JSF component validation?",
+   o:["`required=\"true\"`","`<f:validateLongRange>`","`@Past`","`requiredMessage`"], a:2,
+   e:"`@Min`, `@Max`, `@Past` and `@Pattern` go on model properties. `required` and `<f:validateLongRange>` go in the Facelet."},
+  {t:"conv", s:24, q:"An age input has `<f:validateLongRange minimum=\"18\" maximum=\"100\" />`. The user enters `15`. What happens?",
+   o:["Conversion fails","Validation fails and the page is redisplayed with a message","15 is saved","JSF rounds it to 18"], a:1,
+   e:"15 converts to a number but falls outside the allowed range, so validation fails."},
+  {t:"conv", s:25, q:"In the Bouncer example, the user enters `-20` for X position. What happens?",
+   o:["Conversion fails because of the minus sign","\"-20\" converts to Integer, `@Min(0)` validation fails, and the model is not updated","The value is saved and corrected later","`@Max` fails"], a:1,
+   e:"\"X position cannot be negative.\" is shown, the model isn't updated, and the action isn't invoked."},
+  {t:"conv", s:25, q:"In the Bouncer entity, which constant limits `x` through `@Max`?",
+   o:["`FRAME_HEIGHT`","`MAX_SPEED`","`FRAME_WIDTH`","`MIN_X`"], a:2,
+   e:"`x` uses `FRAME_WIDTH`. `y` uses `FRAME_HEIGHT`, and `ySpeed` uses `MAX_SPEED`."},
+  {t:"conv", s:26, q:"After the user clicks Save on `Create.xhtml` and the input is valid, what finally stores the Contact?",
+   o:["The Facelet writes it directly","`create()` runs and `ContactFacade` persists `selected` to the database","`prepareCreate()` saves it","The browser sends it to the REST API"], a:1,
+   e:"One click travels through the JSF lifecycle and the backing bean, and `ContactFacade` persists the Contact as a database row."}
+];
+
+const BANK = [
+  ...JPA_BANK.map(q => ({ ...q, d: "jpa" })),
+  ...JSF_BANK.map(q => ({ ...q, d: "jsf" }))
+];
+
 const app = document.getElementById("app");
 const LETTERS = "ABCDE";
 const setup = { topics: new Set(Object.keys(TOPICS)), count: 20, shuffle: true };
@@ -421,31 +621,42 @@ function makeRun(questions) {
 function startFromSetup() {
   let qs = pool();
   if (setup.shuffle) qs = shuffled(qs);
-  else qs = qs.slice().sort((a, b) => a.s - b.s);
+  else qs = qs.slice().sort((a, b) => (a.d === b.d ? 0 : a.d === "jpa" ? -1 : 1) || a.s - b.s);
   const n = plannedCount();
   makeRun(qs.slice(0, n));
 }
 
 function renderSetup() {
   run = null;
-  const counts = {};
-  BANK.forEach(q => counts[q.t] = (counts[q.t] || 0) + 1);
-  const slides = new Set(BANK.map(q => q.s)).size;
+  const counts = {}, deckCounts = {};
+  BANK.forEach(q => { counts[q.t] = (counts[q.t] || 0) + 1; deckCounts[q.d] = (deckCounts[q.d] || 0) + 1; });
   const n = plannedCount();
+  const deckGroup = d => {
+    const keys = Object.keys(TOPICS).filter(k => TOPIC_DECK[k] === d);
+    const allOn = keys.every(k => setup.topics.has(k));
+    return `
+      <div class="deck">
+        <div class="deckhead">
+          <span class="deckname">${esc(DECKS[d])} <span class="n">${deckCounts[d]} questions</span></span>
+          <button type="button" class="linkish" id="deck-${d}" data-deck="${d}">${allOn ? "Clear" : "Select all"}</button>
+        </div>
+        <div class="chips">
+          ${keys.map(k => `
+            <button type="button" class="chip" id="topic-${k}" data-topic="${k}" aria-pressed="${setup.topics.has(k)}">${esc(TOPICS[k])} <span class="n">${counts[k]}</span></button>`).join("")}
+        </div>
+      </div>`;
+  };
   app.innerHTML = `
     <section class="panel" aria-labelledby="setupTitle">
-      <div class="meta"><span id="setupTitle"><strong>${BANK.length} questions</strong> drawn from ${slides} slides</span><span>Slides 2–36</span></div>
+      <div class="meta"><span id="setupTitle"><strong>${BANK.length} questions</strong> from ${Object.keys(DECKS).length} slide decks</span><span>${pool().length} selected</span></div>
       <div class="field">
         <span class="label">Topics</span>
-        <div class="chips">
-          ${Object.entries(TOPICS).map(([k, v]) => `
-            <button type="button" class="chip" id="topic-${k}" data-topic="${k}" aria-pressed="${setup.topics.has(k)}">${esc(v)} <span class="n">${counts[k]}</span></button>`).join("")}
-        </div>
+        ${Object.keys(DECKS).map(deckGroup).join("")}
       </div>
       <div class="field">
         <span class="label">Length</span>
         <div class="seg" role="group" aria-label="Number of questions">
-          ${[[10,"10"],[20,"20"],[0,"All"]].map(([v, l]) => `<button type="button" id="count-${l}" data-count="${v}" aria-pressed="${setup.count === v}">${l}</button>`).join("")}
+          ${[[10,"10"],[20,"20"],[40,"40"],[0,"All"]].map(([v, l]) => `<button type="button" id="count-${l}" data-count="${v}" aria-pressed="${setup.count === v}">${l}</button>`).join("")}
         </div>
       </div>
       <label class="check"><input type="checkbox" id="shuffle" ${setup.shuffle ? "checked" : ""}> Shuffle questions (off follows slide order)</label>
@@ -459,6 +670,14 @@ function renderSetup() {
     setup.topics.has(k) ? setup.topics.delete(k) : setup.topics.add(k);
     renderSetup();
     document.getElementById("topic-" + k).focus();
+  });
+  app.querySelectorAll("[data-deck]").forEach(b => b.onclick = () => {
+    const d = b.dataset.deck;
+    const keys = Object.keys(TOPICS).filter(k => TOPIC_DECK[k] === d);
+    const allOn = keys.every(k => setup.topics.has(k));
+    keys.forEach(k => allOn ? setup.topics.delete(k) : setup.topics.add(k));
+    renderSetup();
+    document.getElementById("deck-" + d).focus();
   });
   app.querySelectorAll("[data-count]").forEach(b => b.onclick = () => {
     setup.count = Number(b.dataset.count); renderSetup(); document.getElementById(b.id).focus();
@@ -491,14 +710,14 @@ function renderQuestion() {
         <span><strong>${run.score}</strong> correct</span>
       </div>
       <div class="bar" aria-hidden="true"><span style="width:${(done / total) * 100}%"></span></div>
-      <span class="tag">${esc(TOPICS[it.src.t])} · Slide ${it.src.s}</span>
+      <span class="tag">${esc(DECKS[it.src.d])} · Slide ${it.src.s} · ${esc(TOPICS[it.src.t])}</span>
       <h2 class="qtext">${fmt(it.src.q)}</h2>
       <ul class="opts">${optsHtml}</ul>
       ${answered ? `
         <div class="feedback ${ok ? "ok" : "no"}">
           <span class="verdict">${ok ? "Correct." : "Not quite. The answer is " + LETTERS[it.answer] + "."}</span>
           <p>${fmt(it.src.e)}</p>
-          <span class="src">Source: slide ${it.src.s}</span>
+          <span class="src">Source: ${esc(DECKS[it.src.d])}, slide ${it.src.s}</span>
         </div>
         <div class="row"><button type="button" class="btn" id="next">${last ? "See results" : "Next question"}</button></div>` : ""}
       <div class="row"><button type="button" class="linkish" id="quit">End quiz and see results</button></div>
@@ -558,7 +777,7 @@ function renderResults() {
       <h2 class="sec">${missed.length ? "Missed questions" : "Review"}</h2>
       ${missed.length ? `<ul class="missed">
         ${missed.map(it => `<li>
-          <span class="tag">Slide ${it.src.s} · ${esc(TOPICS[it.src.t])}</span>
+          <span class="tag">${esc(DECKS[it.src.d])} · Slide ${it.src.s} · ${esc(TOPICS[it.src.t])}</span>
           <span class="mq">${fmt(it.src.q)}</span>
           <span class="ans you">Your answer: ${fmt(it.src.o[it.order[it.picked]])}</span>
           <span class="ans right">Correct: ${fmt(it.src.o[it.src.a])}</span>
