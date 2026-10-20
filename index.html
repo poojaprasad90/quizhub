@@ -1,4 +1,4 @@
-<title>JPA & JSF Quiz</title>
+<title>Jakarta EE Quiz</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -165,15 +165,17 @@ h2.sec { font-family: var(--font-display); font-weight: 600; font-size: 20px; ma
 
 <div class="wrap">
   <header>
-    <span class="eyebrow">CST8218 · Persistence with JPA · JavaServer Faces</span>
-    <h1>JPA &amp; JSF <span class="at">Quiz</span></h1>
-    <p class="lede">Multiple-choice practice built from two lecture decks: persistence with JPA (beans, entity mapping, persistence units, Lab 2) and JavaServer Faces (Facelets, EL, scopes, the request lifecycle, conversion and validation).</p>
+    <span class="eyebrow">CST8218 · JPA · REST with JAX-RS · JavaServer Faces</span>
+    <h1>Jakarta EE <span class="at">Quiz</span></h1>
+    <p class="lede">Multiple-choice practice from three lecture weeks: persistence with JPA (beans, entity mapping, persistence units, Lab 2), RESTful APIs with JAX-RS (constraints, HTTP methods and messages, Lab 3) and JavaServer Faces (Facelets, EL, scopes, the request lifecycle, conversion and validation).</p>
   </header>
   <main id="app"></main>
 </div>
 
 <script>
-const DECKS = { jpa: "Persistence with JPA", jsf: "JavaServer Faces" };
+const DECKS = { jpa: "Persistence with JPA", rest3: "RESTful APIs with JAX-RS", jsf: "JavaServer Faces" };
+const DECK_ORDER = Object.keys(DECKS);
+function ref(q) { return q.d === "rest3" ? "Question " + q.s : "Slide " + q.s; }
 const TOPICS = {
   arch:   "Architecture & layers",
   beans:  "Beans & injection",
@@ -181,13 +183,17 @@ const TOPICS = {
   entity: "Entity mapping",
   pu:     "Persistence units & JTA",
   lab:    "DataSource & Lab 2",
+  rbasics:"REST concepts",
+  rcons:  "REST constraints",
+  rhttp:  "HTTP methods & messages",
+  jaxrs:  "JAX-RS & Lab 3",
   rest:   "REST recap & two paths",
   face:   "Facelets & templates",
   el:     "Named beans, scopes & EL",
   life:   "Lifecycle & navigation",
   conv:   "Conversion & validation"
 };
-const TOPIC_DECK = { arch:"jpa", beans:"jpa", jpa:"jpa", entity:"jpa", pu:"jpa", lab:"jpa", rest:"jsf", face:"jsf", el:"jsf", life:"jsf", conv:"jsf" };
+const TOPIC_DECK = { arch:"jpa", beans:"jpa", jpa:"jpa", entity:"jpa", pu:"jpa", lab:"jpa", rbasics:"rest3", rcons:"rest3", rhttp:"rest3", jaxrs:"rest3", rest:"jsf", face:"jsf", el:"jsf", life:"jsf", conv:"jsf" };
 
 const JPA_BANK = [
   // Architecture & layers (slides 2-4)
@@ -587,8 +593,115 @@ const JSF_BANK = [
    e:"One click travels through the JSF lifecycle and the backing bean, and `ContactFacade` persists the Contact as a database row."}
 ];
 
+const REST_BANK = [
+  // REST concepts (Q1-7)
+  {t:"rbasics", s:1, q:"REST stands for:",
+   o:["Reliable State Transfer","Representational State Transfer","Remote Service Transaction","Representational System Transport"], a:1,
+   e:"REST is REpresentational State Transfer."},
+  {t:"rbasics", s:2, q:"In a RESTful API, resources are identified by ___ and acted upon using ___.",
+   o:["URLs; HTTP methods","HTTP methods; URLs","headers; cookies","JSON; XML"], a:0,
+   e:"The URL identifies the resource (the noun), and the HTTP method specifies the operation (the verb)."},
+  {t:"rbasics", s:3, q:"What does calling REST an \"architectural style\" mean?",
+   o:["It is a communication protocol that defines message formats","It is a specific set of Java classes you must implement","It defines high-level constraints for design, not specific source code","It is a data format like JSON or XML"], a:2,
+   e:"A style gives high-level design rules and constraints, not particular Java classes or code."},
+  {t:"rbasics", s:4, q:"In a RESTful API, resources are best named as:",
+   o:["verbs describing actions","nouns","HTTP status codes","method names"], a:1,
+   e:"Resources are nouns, such as Contacts, Products or Orders. The HTTP method expresses the action."},
+  {t:"rbasics", s:5, q:"Which URL refers to a single contact rather than the whole collection?",
+   o:["`/contacts`","`/contacts/all`","`/contacts/1`","`/contact/list`"], a:2,
+   e:"`/contacts/1` is one resource. `/contacts` is the collection."},
+  {t:"rbasics", s:6, q:"In \"Representational State Transfer\", the State of a resource is:",
+   o:["the HTTP status code returned","the data values describing the resource at a particular time","whether the server keeps a session","the choice between JSON and XML"], a:1,
+   e:"State means the resource's data values at a given time, such as a contact's name, email and phone."},
+  {t:"rbasics", s:7, q:"JSON stands for JavaScript Object Notation. In JSON, a single object is written using:",
+   o:["square brackets `[ ]`","curly braces `{ }`","angle tags `< >`","parentheses `( )`"], a:1,
+   e:"A JSON object uses `{ }`, and an array uses `[ ]`."},
+
+  // REST constraints (Q8-13)
+  {t:"rcons", s:8, q:"Which of the following is NOT one of the REST constraints?",
+   o:["Stateless","Cacheable","Layered System","Object-Oriented"], a:3,
+   e:"The six constraints are Client-Server, Stateless, Cacheable, Uniform Interface, Layered System and Code-on-Demand. Object-Oriented is not one of them."},
+  {t:"rcons", s:9, q:"Which REST constraint is the only one that is optional?",
+   o:["Code-on-Demand","Uniform Interface","Client-Server","Stateless"], a:0,
+   e:"Code-on-Demand is the only optional constraint."},
+  {t:"rcons", s:10, q:"The Stateless constraint means:",
+   o:["the server stores each client's session state","no client state is stored on the server; each request carries all the information needed to process it","the client may not store any data","responses may never be cached"], a:1,
+   e:"The server keeps no client state, so every request must be self-contained."},
+  {t:"rcons", s:11, q:"Compared with a stateful design, a stateless design:",
+   o:["handles crashes poorly and is hard to scale","requires the server to save session information","handles crashes well and scales easily","requires every request to stick to one server"], a:2,
+   e:"A stateless design is simpler, fails over to a new server easily, and scales easily. A stateful design is the opposite."},
+  {t:"rcons", s:12, q:"In the caching example, which status code tells the client its cached copy is still fresh and returns no payload?",
+   o:["200 OK","204 No Content","304 Not Modified","404 Not Found"], a:2,
+   e:"304 Not Modified confirms the cached copy is still valid and sends no payload."},
+  {t:"rcons", s:13, q:"The Layered System constraint means:",
+   o:["the client must know how many layers exist","a request may pass through intermediaries (proxy, gateway, load balancer) that the client need not know about","each request passes through exactly one layer","layers cannot be changed after deployment"], a:1,
+   e:"The client sees one endpoint. Intermediate layers can be added or changed without affecting it."},
+
+  // HTTP methods & messages (Q14-26)
+  {t:"rhttp", s:14, q:"Which HTTP method is normally used to create a new resource?",
+   o:["GET","POST","PUT","DELETE"], a:1,
+   e:"POST creates a new resource in a collection."},
+  {t:"rhttp", s:15, q:"An HTTP operation is idempotent when:",
+   o:["the response body is always identical","sending the same request several times has the same intended effect as sending it once","it can be sent only once","it always returns 200 OK"], a:1,
+   e:"Idempotence is about the same intended effect on server state, not identical responses."},
+  {t:"rhttp", s:16, q:"Which statement correctly contrasts repeated PUT and POST?",
+   o:["repeated PUT creates many resources; repeated POST does not","both are always idempotent","repeated PUT leaves the final resource state the same; repeated POST may create additional resources","neither changes server state"], a:2,
+   e:"PUT is idempotent and leaves the same final state. POST generally is not, and may create extra resources."},
+  {t:"rhttp", s:17, q:"Which methods are typically supported on the collection URL `/contacts`?",
+   o:["GET and POST","GET, PUT, DELETE","PUT and DELETE","DELETE only"], a:0,
+   e:"On the collection, GET lists the contacts and POST creates a new one."},
+  {t:"rhttp", s:18, q:"Which methods are typically supported on a single-resource URL `/contacts/{id}`?",
+   o:["POST only","GET and POST","GET, PUT, DELETE","GET only"], a:2,
+   e:"On a single resource, GET reads it, PUT updates it and DELETE removes it."},
+  {t:"rhttp", s:19, q:"Which best summarizes the relationship between REST and HTTP?",
+   o:["they are interchangeable alternatives","REST is a protocol and HTTP is an architectural style","REST provides the design constraints; HTTP provides the communication mechanism","using HTTP automatically makes an API RESTful"], a:2,
+   e:"REST supplies the design constraints and HTTP supplies the communication mechanism. They are not alternatives."},
+  {t:"rhttp", s:20, q:"Which statement is TRUE?",
+   o:["every HTTP API is automatically RESTful","an HTTP API is RESTful only when its design follows the REST constraints","RESTful APIs cannot use HTTP","REST is a replacement for HTTP"], a:1,
+   e:"Using HTTP does not by itself make an API RESTful. The design must follow the REST constraints."},
+  {t:"rhttp", s:21, q:"The `Accept` request header tells the server:",
+   o:["what format the request body contains","what representation format the client wants back","which HTTP method to use","the status code to return"], a:1,
+   e:"`Accept` states what the client wants back in the response."},
+  {t:"rhttp", s:22, q:"The `Content-Type` header indicates:",
+   o:["what the client wants back","the media type/format of the message body","the resource's URL","the cache duration"], a:1,
+   e:"`Content-Type` describes the format of the body actually being sent."},
+  {t:"rhttp", s:23, q:"Both HTTP requests and responses are built from which four parts?",
+   o:["method, URL, headers, body","a start line, headers, a blank line, and an optional body","protocol, host, port, path","status code, cookies, headers, body"], a:1,
+   e:"Requests and responses share the same four parts: start line, headers, blank line and optional body."},
+  {t:"rhttp", s:24, q:"In an HTTP response, the start line contains:",
+   o:["method + resource path + protocol version","protocol version + status code + status text","Content-Type + length","headers + blank line"], a:1,
+   e:"A response start line looks like `HTTP/1.1 200 OK`. A request start line is method, path and version."},
+  {t:"rhttp", s:25, q:"Which status code means a new resource was successfully created?",
+   o:["200 OK","201 Created","204 No Content","400 Bad Request"], a:1,
+   e:"201 Created reports that the new resource was created."},
+  {t:"rhttp", s:26, q:"After a successful POST, which response header gives the URL of the newly created resource?",
+   o:["`Content-Type`","`Accept`","`Location`","`ETag`"], a:2,
+   e:"The `Location` header holds the new resource's URL, for example `/contacts/5`."},
+
+  // JAX-RS & Lab 3 (Q27-32)
+  {t:"jaxrs", s:27, q:"JAX-RS is now officially known as:",
+   o:["Java API for RESTful Web Services","Jakarta RESTful Web Services","Jakarta Persistence API","Jakarta Server Faces"], a:1,
+   e:"It was formerly the Java API for RESTful Web Services and is now Jakarta RESTful Web Services."},
+  {t:"jaxrs", s:28, q:"The annotation `@ApplicationPath(\"resources\")` is used to:",
+   o:["map a single method to /resources","define the common base URL path for all JAX-RS resources","configure the database persistence unit","set the response status code"], a:1,
+   e:"`@ApplicationPath` sets the base path for all JAX-RS resources. The configuration class extends `jakarta.ws.rs.core.Application`."},
+  {t:"jaxrs", s:29, q:"In a JAX-RS resource class, a method-level `@Path`:",
+   o:["replaces the class-level `@Path`","extends the path defined on the class","is mandatory on every method","sets the application base path"], a:1,
+   e:"A method `@Path` is appended to the class `@Path`, so class `/contact` plus method `/count` gives `/contact/count`."},
+  {t:"jaxrs", s:30, q:"In `ContactFacadeREST`, `@PersistenceContext` is used to:",
+   o:["create an `EntityManager` with the `new` keyword","obtain a container-managed `EntityManager` supplied by GlassFish","define the REST base path","cache HTTP responses"], a:1,
+   e:"`@PersistenceContext` injects a container-managed `EntityManager`. Its `unitName` must match `persistence.xml`, and the app never uses `new`."},
+  {t:"jaxrs", s:31, q:"NetBeans generates CRUD REST code. The standard mapping of HTTP methods to CRUD operations is:",
+   o:["POST=Create, GET=Read, PUT=Update, DELETE=Delete","GET=Create, POST=Read, PUT=Update, DELETE=Delete","PUT=Create, GET=Read, POST=Update, DELETE=Delete","POST=Create, PUT=Read, GET=Update, DELETE=Delete"], a:0,
+   e:"POST creates, GET reads, PUT updates and DELETE deletes."},
+  {t:"jaxrs", s:32, q:"In Lab 3, Postman is:",
+   o:["part of the application running on GlassFish","an external API client used to send HTTP requests and view responses","the database that stores contacts","the JAX-RS code generator"], a:1,
+   e:"Postman is an external client, not part of the deployed app. Lab 3 has no JSF UI, so Postman is used to send requests and inspect responses."}
+];
+
 const BANK = [
   ...JPA_BANK.map(q => ({ ...q, d: "jpa" })),
+  ...REST_BANK.map(q => ({ ...q, d: "rest3" })),
   ...JSF_BANK.map(q => ({ ...q, d: "jsf" }))
 ];
 
@@ -621,7 +734,7 @@ function makeRun(questions) {
 function startFromSetup() {
   let qs = pool();
   if (setup.shuffle) qs = shuffled(qs);
-  else qs = qs.slice().sort((a, b) => (a.d === b.d ? 0 : a.d === "jpa" ? -1 : 1) || a.s - b.s);
+  else qs = qs.slice().sort((a, b) => (DECK_ORDER.indexOf(a.d) - DECK_ORDER.indexOf(b.d)) || a.s - b.s);
   const n = plannedCount();
   makeRun(qs.slice(0, n));
 }
@@ -648,7 +761,7 @@ function renderSetup() {
   };
   app.innerHTML = `
     <section class="panel" aria-labelledby="setupTitle">
-      <div class="meta"><span id="setupTitle"><strong>${BANK.length} questions</strong> from ${Object.keys(DECKS).length} slide decks</span><span>${pool().length} selected</span></div>
+      <div class="meta"><span id="setupTitle"><strong>${BANK.length} questions</strong> from ${Object.keys(DECKS).length} lecture decks</span><span>${pool().length} selected</span></div>
       <div class="field">
         <span class="label">Topics</span>
         ${Object.keys(DECKS).map(deckGroup).join("")}
@@ -710,14 +823,14 @@ function renderQuestion() {
         <span><strong>${run.score}</strong> correct</span>
       </div>
       <div class="bar" aria-hidden="true"><span style="width:${(done / total) * 100}%"></span></div>
-      <span class="tag">${esc(DECKS[it.src.d])} · Slide ${it.src.s} · ${esc(TOPICS[it.src.t])}</span>
+      <span class="tag">${esc(DECKS[it.src.d])} · ${ref(it.src)} · ${esc(TOPICS[it.src.t])}</span>
       <h2 class="qtext">${fmt(it.src.q)}</h2>
       <ul class="opts">${optsHtml}</ul>
       ${answered ? `
         <div class="feedback ${ok ? "ok" : "no"}">
           <span class="verdict">${ok ? "Correct." : "Not quite. The answer is " + LETTERS[it.answer] + "."}</span>
           <p>${fmt(it.src.e)}</p>
-          <span class="src">Source: ${esc(DECKS[it.src.d])}, slide ${it.src.s}</span>
+          <span class="src">Source: ${esc(DECKS[it.src.d])}, ${ref(it.src).toLowerCase()}</span>
         </div>
         <div class="row"><button type="button" class="btn" id="next">${last ? "See results" : "Next question"}</button></div>` : ""}
       <div class="row"><button type="button" class="linkish" id="quit">End quiz and see results</button></div>
@@ -777,7 +890,7 @@ function renderResults() {
       <h2 class="sec">${missed.length ? "Missed questions" : "Review"}</h2>
       ${missed.length ? `<ul class="missed">
         ${missed.map(it => `<li>
-          <span class="tag">${esc(DECKS[it.src.d])} · Slide ${it.src.s} · ${esc(TOPICS[it.src.t])}</span>
+          <span class="tag">${esc(DECKS[it.src.d])} · ${ref(it.src)} · ${esc(TOPICS[it.src.t])}</span>
           <span class="mq">${fmt(it.src.q)}</span>
           <span class="ans you">Your answer: ${fmt(it.src.o[it.order[it.picked]])}</span>
           <span class="ans right">Correct: ${fmt(it.src.o[it.src.a])}</span>
